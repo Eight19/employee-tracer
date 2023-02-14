@@ -265,3 +265,80 @@ const addRole = () => {
     };
   });
 };
+//Connects the department to new role//
+//Question for the user to add a new department for employee//
+const addDepartment = () => {
+  prompt([
+        {
+          name: 'newDepartment',
+          type: 'text',
+          message: 'Enter the new department name.'
+        }
+      ])
+      .then((answer) => {
+        let sql = `INSERT INTO department (department_name) VALUES (?)`;
+        connection.query(sql, answer.newDepartment, (error, response) => {
+          if (error) throw error;
+          console.log(
+            "------------------------------------------------------------------"
+          );
+          console.log(answer.newDepartment + " department added!");
+          viewAllDepartments();
+        });
+      });
+  };
+  
+  //Connects the employee to new role//
+  //Question for the user to update the employee role//
+  const updateEmployeeRole = () => {
+  
+    let employeesArray = []
+  
+    connection.query(
+        `SELECT first_name, last_name FROM employee`,
+        (err, res) => {
+            if (err) throw err;
+            prompt([
+                {
+                    type: "list",
+                    name: "employee",
+                    message: "Which employee has a new role?",
+                    choices() {
+                        res.forEach(employee => {
+                            employeesArray.push(`${employee.first_name} ${employee.last_name}`);
+                        });
+                        return employeesArray;
+                    }
+                },
+                {
+                  //Question for the user to update new role id//
+                    type: "input",
+                    name: "role",
+                    message: `Choose the new role ID.${Chalk.red('\nDesigner: 1\nSenior Designer: 2\nPresident: 3\nIntern: 4\nConsultant: 5\nPress: 6\nTemp: 7\n' + Chalk.cyan('Your Answer: '))}`
+                }
+            ]).then( (answers) => {
+  
+                const updateEmployeeRole = answers.employee.split(' ');
+                const updateEmployeeRoleFirstName = JSON.stringify(updateEmployeeRole[0]);
+                const updateEmployeeRoleLastName = JSON.stringify(updateEmployeeRole[1]);
+  
+                connection.query(
+                    `UPDATE employee
+                    SET role_id = ${answers.role}
+                    WHERE first_name = ${updateEmployeeRoleFirstName}
+                    AND last_name = ${updateEmployeeRoleLastName}`,
+  
+                    (err, res) => {
+                        if (err) throw err;
+                        console.log(
+                          "------------------------------------------------------------------"
+                        );
+                        console.log("Employee role has been updated!");
+                        viewAllEmployees();
+                    });
+            });
+        }
+    );  
+  };
+  
+  init();
