@@ -138,3 +138,130 @@ connection.query(sql, (error, response) => {
   menu();
 });
 };
+//Connects the employee to the role and manager//
+//Questions for the user to update the employee role//
+const addEmployee = () => {
+  prompt([
+    {
+      type: "input",
+      name: "firstName",
+      message: "What is the employee's first name?",
+    },
+    {
+      type: "input",
+      name: "lastName",
+      message: "What is the employee's last name?",
+    },
+  ]).then((answer) => {
+    const crit = [answer.firstName, answer.lastName];
+    const roleSql = `SELECT role.id, role.title FROM role`;
+    connection.query(roleSql, (error, data) => {
+      if (error) throw error;
+      const roles = data.map(({ id, title }) => ({ name: title, value: id }));
+      prompt([
+        {
+          type: "list",
+          name: "role",
+          message: "What is the employee's role?",
+          choices: roles,
+        },
+      ]).then((roleChoice) => {
+        const role = roleChoice.role;
+        crit.push(role);
+        const managerSql = `SELECT * FROM employee`;
+        connection.query(managerSql, (error, data) => {
+          if (error) throw error;
+          const managers = data.map(({ id, first_name, last_name }) => ({
+            name: first_name + " " + last_name,
+            value: id,
+          }));
+          prompt([
+            {
+              type: "list",
+              name: "manager",
+              message: "Who is the employee's manager?",
+              choices: managers,
+            },
+          ]).then((managerChoice) => {
+            const manager = managerChoice.manager;
+            crit.push(manager);
+            const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                                  VALUES (?, ?, ?, ?)`;
+            connection.query(sql, crit, (error) => {
+              if (error) throw error;
+              console.log(
+                "------------------------------------------------------------------"
+              );
+              console.log("Employee added successfully!");
+              viewAllEmployees();
+            });
+          });
+        });
+      });
+    });
+  });
+};
+
+//Connects the department to new role//
+//Questions for the user to add a new role//
+const addRole = () => {
+  const sql = "SELECT * FROM department";
+  connection.query(sql, (error, response) => {
+    if (error) throw error;
+     let deptNamesArray = [];
+    response.forEach((department) => {
+      deptNamesArray.push(department.department_name);
+    });
+    deptNamesArray.push("Create Department");
+    prompt([
+      {
+        name: "departmentName",
+        type: "list",
+        message: "Which department does this role belong to?",
+        choices: deptNamesArray,
+      },
+    ]).then((answer) => {
+      if (answer.departmentName === "Create Department") {
+        this.addDepartment();
+      } else {
+        addRoleResume(answer);
+      }
+    });
+//Connects new role to updated salary//
+//Question to add new role and salary//
+    const addRoleResume = (departmentData) => {
+      prompt([
+        {
+          name: "newRole",
+          type: "text",
+          message: "What is the new role?",
+        },
+        {
+          name: "salary",
+          type: "text",
+          message: "What is the new salary?",
+        },
+      ]).then((answer) => {
+        let createdRole = answer.newRole;
+        let departmentId;
+
+        response.forEach((department) => {
+          if (departmentData.departmentName === department.department_name) {
+            departmentId = department.id;
+          }
+        });
+
+        let sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`;
+        let crit = [createdRole, answer.salary, departmentId];
+
+        connection.query(sql, crit, (error) => {
+          if (error) throw error;
+          console.log(
+            "------------------------------------------------------------------"
+          );
+          console.log("Role created!");
+          viewAllRoles();
+        }); });
+    };
+  });
+};
