@@ -1,0 +1,340 @@
+const connection = require("./config/connection");
+const inquirer = require("inquirer");
+const cTable = require("console.table");
+const Chalk = require("chalk");
+prompt = inquirer.createPromptModule();
+
+connection.connect((error) => {
+  if (error) throw error;
+});
+
+prompt([
+  {
+    type: "list",
+    message: `${Chalk.bgBlue.black(
+      "Welcome to the Employee Tracer. Please click continue to start."
+    )}`,
+    choices: ["Continue", "End"],
+    name: "begin",
+  },
+]).then((response) => {
+  switch (response.start) {
+    case "Continue":
+      menu();
+      break;
+    case "End":
+      return console.log("Please restart and try again.");
+  }
+});
+//Questions for the user//
+function menu() {
+  prompt([
+    {
+      name: "choices",
+      type: "list",
+      message: `${Chalk.black.bgGreen(
+        "Which option would you like to choose?"
+      )}`,
+      choices: [
+        "View All Departments",
+        "View All Roles",
+        "View All Employees",
+        "Update Employee Role",
+        "Add Department",
+        "Add Role",
+        "Add Employee",
+        "End",
+      ],
+    },
+  ]).then((answers) => {
+    const { choices } = answers;
+    if (choices === "View All Departments") {
+      viewAllEmployees();
+    }
+    if (choices === "View All Roles") {
+      viewAllRoles();
+    }
+    if (choices === "View All Employees") {
+      viewAllDepartments();
+    }
+    if (choices === "Update Employee Role") {
+      updateEmployeeRole();
+    }
+    if (choices === "Add Department") {
+      addEmployee();
+    }
+    if (choices === "Add Role") {
+      addRole();
+    }
+    if (choices === "Add Employee") {
+      addDepartment();
+    }
+    if (choices === "End") {
+      console.log("Thanks for using Employee Tracer. Goodbye!");
+      connection.end();
+    }
+  });
+}
+
+const viewAllDepartments = () => {
+    let sql = `SELECT department.id AS id, department.department_name AS department FROM department`;
+    connection.query(sql, (error, response) => {
+      if (error) throw error;
+      console.log(
+        "------------------------------------------------------------------"
+      );
+      console.log(`${Chalk.bgYellow("List of Departments:\n")}`);
+      console.table(response);
+      console.log(
+        "------------------------------------------------------------------"
+      );
+      menu();
+    });
+  };
+
+
+// VIEW actions...
+const viewAllEmployees = () => {
+  let sql = `SELECT employee.id, 
+              employee.first_name, 
+              employee.last_name, 
+              department.department_name AS 'department', 
+              role.title, 
+              role.salary
+              FROM employee, role, department 
+              WHERE department.id = role.department_id 
+              AND role.id = employee.role_id
+              ORDER BY employee.id ASC`;
+  connection.query(sql, (error, response) => {
+    if (error) throw error;
+    console.log(
+      "------------------------------------------------------------------"
+    );
+    console.log(`${Chalk.bgCyan("All Employees:\n")}`);
+    console.table(response);
+    console.log(
+      "------------------------------------------------------------------"
+    );
+    menu();
+  });
+};
+
+const viewAllRoles = () => {
+  let sql = `SELECT role.id, role.title, department.department_name AS department
+  FROM role
+  INNER JOIN department ON role.department_id = department.id`;
+  connection.query(sql, (error, response) => {
+    if (error) throw error;
+    console.log(
+      "------------------------------------------------------------------"
+    );
+    console.log(`${Chalk.greenBright("List of Roles:\n")}`);
+    response.forEach((role) => {
+      console.log(role.title);
+    });
+    console.log(
+      "------------------------------------------------------------------"
+    );
+    menu();
+  });
+};
+
+// ADD actions...
+const addEmployee = () => {
+  prompt([
+    {
+      type: "input",
+      name: "firstName",
+      message: "What is the employee's first name?",
+    },
+    {
+      type: "input",
+      name: "lastName",
+      message: "What is the employee's last name?",
+    },
+  ]).then((answer) => {
+    const crit = [answer.firstName, answer.lastName];
+    const roleSql = `SELECT role.id, role.title FROM role`;
+    connection.query(roleSql, (error, data) => {
+      if (error) throw error;
+      const roles = data.map(({ id, title }) => ({ name: title, value: id }));
+      prompt([
+        {
+          type: "list",
+          name: "role",
+          message: "What is the employee's role?",
+          choices: roles,
+        },
+      ]).then((roleChoice) => {
+        const role = roleChoice.role;
+        crit.push(role);
+        const managerSql = `SELECT * FROM employee`;
+        connection.query(managerSql, (error, data) => {
+          if (error) throw error;
+          const managers = data.map(({ id, first_name, last_name }) => ({
+            name: first_name + " " + last_name,
+            value: id,
+          }));
+          prompt([
+            {
+              type: "list",
+              name: "manager",
+              message: "Who is the employee's manager?",
+              choices: managers,
+            },
+          ]).then((managerChoice) => {
+            const manager = managerChoice.manager;
+            crit.push(manager);
+            const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                                  VALUES (?, ?, ?, ?)`;
+            connection.query(sql, crit, (error) => {
+              if (error) throw error;
+              console.log(
+                "------------------------------------------------------------------"
+              );
+              console.log("Employee added successfully!");
+              viewAllEmployees();
+            });
+          });
+        });
+      });
+    });
+  });
+};
+
+//Connects to the department to new role
+const addRole = () => {
+  const sql = "SELECT * FROM department";
+  connection.query(sql, (error, response) => {
+    if (error) throw error;
+     let deptNamesArray = [];
+    response.forEach((department) => {
+      deptNamesArray.push(department.department_name);
+    });
+    deptNamesArray.push("Create Department");
+    prompt([
+      {
+        name: "departmentName",
+        type: "list",
+        message: "Which department does this role belong to?",
+        choices: deptNamesArray,
+      },
+    ]).then((answer) => {
+      if (answer.departmentName === "Create Department") {
+        this.addDepartment();
+      } else {
+        addRoleResume(answer);
+      }
+    });
+
+    const addRoleResume = (departmentData) => {
+      prompt([
+        {
+          name: "newRole",
+          type: "text",
+          message: "What is the new role?",
+        },
+        {
+          name: "salary",
+          type: "text",
+          message: "What is the new salary?",
+        },
+      ]).then((answer) => {
+        let createdRole = answer.newRole;
+        let departmentId;
+
+        response.forEach((department) => {
+          if (departmentData.departmentName === department.department_name) {
+            departmentId = department.id;
+          }
+        });
+
+        let sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`;
+        let crit = [createdRole, answer.salary, departmentId];
+
+        connection.query(sql, crit, (error) => {
+          if (error) throw error;
+          console.log(
+            "------------------------------------------------------------------"
+          );
+          console.log("Role created!");
+          viewAllRoles();
+        });
+      });
+    };
+  });
+};
+
+const addDepartment = () => {
+prompt([
+      {
+        name: 'newDepartment',
+        type: 'text',
+        message: 'Enter the new department name.'
+      }
+    ])
+    .then((answer) => {
+      let sql = `INSERT INTO department (department_name) VALUES (?)`;
+      connection.query(sql, answer.newDepartment, (error, response) => {
+        if (error) throw error;
+        console.log(
+          "------------------------------------------------------------------"
+        );
+        console.log(answer.newDepartment + " department added!");
+        viewAllDepartments();
+      });
+    });
+};
+
+
+// UPDATE action...
+const updateEmployeeRole = () => {
+
+  let employeesArray = []
+
+  connection.query(
+      `SELECT first_name, last_name FROM employee`,
+      (err, res) => {
+          if (err) throw err;
+          prompt([
+              {
+                  type: "list",
+                  name: "employee",
+                  message: "Which employee has a new role?",
+                  choices() {
+                      res.forEach(employee => {
+                          employeesArray.push(`${employee.first_name} ${employee.last_name}`);
+                      });
+                      return employeesArray;
+                  }
+              },
+              {
+                  type: "input",
+                  name: "role",
+                  message: `Enter the new role ID from the choices below.${Chalk.greenBright('\nDesigner: 1\nSenior Designer: 2\nPresident: 3\nIntern: 4\nConsultant: 5\nPress: 6\nTemp: 7\n' + Chalk.cyan('Your Answer: '))}`
+              }
+          ]).then( (answers) => {
+
+              const updateEmployeeRole = answers.employee.split(' ');
+              const updateEmployeeRoleFirstName = JSON.stringify(updateEmployeeRole[0]);
+              const updateEmployeeRoleLastName = JSON.stringify(updateEmployeeRole[1]);
+
+              connection.query(
+                  `UPDATE employee
+                  SET role_id = ${answers.role}
+                  WHERE first_name = ${updateEmployeeRoleFirstName}
+                  AND last_name = ${updateEmployeeRoleLastName}`,
+
+                  (err, res) => {
+                      if (err) throw err;
+                      console.log(
+                        "------------------------------------------------------------------"
+                      );
+                      console.log("Employee role updated successfully!");
+                      viewAllEmployees();
+                  }
+              );
+          });
+      }
+  );  
+};
