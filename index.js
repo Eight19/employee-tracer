@@ -27,7 +27,7 @@ prompt([
       return console.log("Please restart and try again.");
   }
 });
-//Questions for the user//
+//Start-up question for the user//
 function menu() {
   prompt([
     {
@@ -37,9 +37,9 @@ function menu() {
         "Which option would you like to choose?"
       )}`,
       choices: [
-        "View All Departments",
-        "View All Roles",
-        "View All Employees",
+        "See All Departments",
+        "See All Roles",
+        "See All Employees",
         "Update Employee Role",
         "Add Department",
         "Add Role",
@@ -49,14 +49,14 @@ function menu() {
     },
   ]).then((answers) => {
     const { choices } = answers;
-    if (choices === "View All Departments") {
-      viewAllEmployees();
+    if (choices === "See Departments") {
+      seeEmployees();
     }
-    if (choices === "View All Roles") {
-      viewAllRoles();
+    if (choices === "See Roles") {
+      seeRoles();
     }
-    if (choices === "View All Employees") {
-      viewAllDepartments();
+    if (choices === "see Employees") {
+      seeDepartments();
     }
     if (choices === "Update Employee Role") {
       updateEmployeeRole();
@@ -76,4 +76,65 @@ function menu() {
     }
   });
 }
+//Department selection//
+const seeDepartments = () => {
+  let sql = `SELECT department.id AS id, department.department_name AS department FROM department`;
+  connection.query(sql, (error, response) => {
+    if (error) throw error;
+    console.log(
+      "------------------------------------------------------------------"
+    );
+    console.log(`${Chalk.bgYellow("List of Departments:\n")}`);
+    console.table(response);
+    console.log(
+      "------------------------------------------------------------------"
+    );
+    menu();
+  });
+};
 
+//Employee selection//
+const seeEmployees = () => {
+let sql = `SELECT employee.id, 
+            employee.first_name, 
+            employee.last_name, 
+            department.department_name AS 'department', 
+            role.title, 
+            role.salary
+            FROM employee, role, department 
+            WHERE department.id = role.department_id 
+            AND role.id = employee.role_id
+            ORDER BY employee.id ASC`;
+connection.query(sql, (error, response) => {
+  if (error) throw error;
+  console.log(
+    "------------------------------------------------------------------"
+  );
+  console.log(`${Chalk.bgCyan("All Employees:\n")}`);
+  console.table(response);
+  console.log(
+    "------------------------------------------------------------------"
+  );
+  menu();
+});
+};
+//ROLE selection//
+const seeRoles = () => {
+let sql = `SELECT role.id, role.title, department.department_name AS department
+FROM role
+INNER JOIN department ON role.department_id = department.id`;
+connection.query(sql, (error, response) => {
+  if (error) throw error;
+  console.log(
+    "------------------------------------------------------------------"
+  );
+  console.log(`${Chalk.yellow("List of Roles:\n")}`);
+  response.forEach((role) => {
+    console.log(role.title);
+  });
+  console.log(
+    "------------------------------------------------------------------"
+  );
+  menu();
+});
+};
