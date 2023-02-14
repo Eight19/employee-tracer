@@ -34,7 +34,7 @@ function menu() {
       name: "choices",
       type: "list",
       message: `${Chalk.black.bgGreen(
-        "Which option would you like to choose?"
+        "Please select from the following options?"
       )}`,
       choices: [
         "See All Departments",
@@ -58,7 +58,7 @@ function menu() {
     if (choices === "see Employees") {
       seeDepartments();
     }
-    if (choices === "Update Employee Role") {
+    if (choices === "Employee Role Update") {
       updateEmployeeRole();
     }
     if (choices === "Add Department") {
