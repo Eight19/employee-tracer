@@ -148,7 +148,6 @@ const updateRole = async () => {
         update('employee', roleId, answers.id);
     })
 }
-
 //Function to update manager//
 const updateManager = async () => {
     const [managers] = await selectNameAndValue('employee', 'first_name', 'last_name', 'id');
@@ -172,44 +171,43 @@ const updateManager = async () => {
         update('employee', managerId, answers.id);
     })
 }
-// Switch case for the possible cases provided below
+//Switch case for possible cases//
 const selectOption = (type) => {
     switch (type) {
-      case 'View All Employees': {
-        selectAllEmployeeDetails();
+      case 'View Employees': {
+        selectDetailsOfEmployee();
         break;
       }
-      case 'View All Departments': {
+      case 'View Departments': {
         selectAll('department', true);
         break;
       }
-      case 'View All Roles': {
+      case 'View Roles': {
         selectAll('role', true);
         break;
       }
-      case 'Add Employee': {
+      case 'Add an Employee': {
         addEmployee();
         break;
       }
-      case 'Add Role': {
+      case 'Add a Role': {
         addRole();
         break;
       }
-      case 'Update Employee Role': {
+      case 'Update an Employee Role': {
         updateRole();
         break;
       }
-      case 'Update Employee Manager': {
+      case 'Update an Employee Manager': {
         updateManager();
         break;
       }
-      case 'Done': {
+      case 'finish': {
         process.exit();
       }
     }
   };
-  
-  // Initial prompt that can be repeated indefinitely or exited via 'Done'
+  //Initial prompt to select an option//
   const init = () => {
     prompt({
       type: 'rawlist',
