@@ -12,6 +12,6 @@ Take a look at a preview of how the Employee Tracer functions.
 
 ## Installation
 
-You will need to copy the HTTPS ID or SSH and clone it to your repository. Execute the git clone command in your terminal, then run npm i to install the dependencies needed. Run mysql -uroot to access mySQL. Next, run source db/schema.sql; and source db/seeds.sql; and then npm start to begin.
+You will need to copy the HTTPS ID or SSH and clone it to your repository. Execute the git clone command in your terminal, then run "npm i" to install the dependencies needed. Run "mysql -uroot" to access mySQL. Next, run "source db/schema.sql;" and "source db/seeds.sql;" and then "npm start" to begin.
 
 
