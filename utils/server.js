@@ -1,6 +1,6 @@
 require('console.table');
 const inquirer = require('inquirer');
-const { chose, confirm } = require('./utils/questions');
+const { chose, confirm } = require('./utils/server');
 const mysql = require('mysql2');
 
 const prompt = inquirer.createPromptModule();
@@ -41,11 +41,7 @@ const init  = () => {
                     'View All Roles',
                 ],
                 name: 'type',
-            })
+            })};
 
-                .then((answers)) => {
-                    chooseOption(answers.type);
-                };
-            };
                 
 init();

@@ -1,5 +1,5 @@
 //Connected to the server and Added questions for user//
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const connection = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -15,7 +15,7 @@ function start () {
   inquirer.prompt([
     {
       type: 'list',
-      name: 'choice',
+      name: 'choices',
       message: 'What do you want to do?',
       choices: [
         'View Departments',
@@ -25,27 +25,13 @@ function start () {
         'Add Role',
         'Add Employee',
         'Update Employee Role'
-      ],
+      ]
+      ,
     }]).then(function(answer){
          console.log(answer)
 
     })
-// //inquirer.prompt([
-//   {
-//     type: "list",
-//     name: "begin",
-//     message: 'select "Continue" to begin or "End" to exit',
-//     choices: ["Continue", "End"]
-//   },
-// ]).then((response) => {
-//   switch (response.start) {
-//     case "Continue":
-//       menu();
-//       break;
-//     case "End":
-//       return console.log("Please restart and try again.");
-//   }
-// });
+
 }
 start();
 
@@ -363,4 +349,4 @@ const addDepartment = () => {
     );  
   };
   
-  init();
+ 
