@@ -11,33 +11,32 @@ const cTable = require("console.table");
 const Chalk = require("chalk");
 //prompt = inquirer.createPromptModule();
 
-function start () {
-  inquirer.prompt([
-    {
-      type: 'list',
-      name: 'choices',
-      message: 'What do you want to do?',
-      choices: [
-        'View Departments',
-        'View Roles',
-        'View Employees',
-        'Add Department',
-        'Add Role',
-        'Add Employee',
-        'Update Employee Role'
-      ]
-      ,
-    }]).then(function(answer){
-         console.log(answer)
+// function menu () {
+//   inquirer.prompt([
+//     {
+//       type: 'list',
+//       name: 'choice',
+//       message: 'What do you want to do?',
+//       choices: [
+//         'View Departments',
+//         'View Roles',
+//         'View Employees',
+//         'Add Department',
+//         'Add Role',
+//         'Add Employee',
+//         'Update Employee Role'
+//       ],
+//     }]).then(function(answer){
+//          console.log(answer)
 
-    })
+//     })
 
-}
-start();
+// }
+// menu();
 
 //Start-up question for the user//
 function menu() {
-  prompt([
+  inquirer.prompt([
     {
       name: "choices",
       type: "list",
@@ -349,4 +348,4 @@ const addDepartment = () => {
     );  
   };
   
- 
+  menu();
