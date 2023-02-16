@@ -2,7 +2,7 @@
 
 ## Description
 
-The Employee Tracer is a command-line application created to manage a company's employee database, using Node.js, Inquirer, and MySQL.A walkthrough video can be found via that demonstrates its functionality.
+The Employee Tracer is a command-line application created to manage a company's employee database, using Node.js, Inquirer, and MySQL. A walk-through video can be found via that demonstrates its functionality.
 
 ## Usage
 

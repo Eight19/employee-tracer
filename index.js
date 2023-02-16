@@ -1,32 +1,54 @@
 //Connected to the server and Added questions for user//
-const connection = require("./config/connection");
+const mysql = require("mysql");
+const connection = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "password",
+  database: "employee_tracer",
+  });
 const inquirer = require("inquirer");
 const cTable = require("console.table");
 const Chalk = require("chalk");
-prompt = inquirer.createPromptModule();
+//prompt = inquirer.createPromptModule();
 
-connection.connect((error) => {
-  if (error) throw error;
-});
+function start () {
+  inquirer.prompt([
+    {
+      type: 'list',
+      name: 'choice',
+      message: 'What do you want to do?',
+      choices: [
+        'View Departments',
+        'View Roles',
+        'View Employees',
+        'Add Department',
+        'Add Role',
+        'Add Employee',
+        'Update Employee Role'
+      ],
+    }]).then(function(answer){
+         console.log(answer)
 
-prompt([
-  {
-    type: "list",
-    message: `${Chalk.bgBlue.black(
-      "Welcome to the Employee Tracer. Please click continue to start."
-    )}`,
-    choices: ["Continue", "End"],
-    name: "begin",
-  },
-]).then((response) => {
-  switch (response.start) {
-    case "Continue":
-      menu();
-      break;
-    case "End":
-      return console.log("Please restart and try again.");
-  }
-});
+    })
+// //inquirer.prompt([
+//   {
+//     type: "list",
+//     name: "begin",
+//     message: 'select "Continue" to begin or "End" to exit',
+//     choices: ["Continue", "End"]
+//   },
+// ]).then((response) => {
+//   switch (response.start) {
+//     case "Continue":
+//       menu();
+//       break;
+//     case "End":
+//       return console.log("Please restart and try again.");
+//   }
+// });
+}
+start();
+
 //Start-up question for the user//
 function menu() {
   prompt([
