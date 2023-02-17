@@ -1,7 +1,5 @@
---EMPLOYEE DATABASE--
-USE employee_db;
+USE employee_tracer;
 
---Added Departments--
 INSERT INTO department (name)
     VALUES
     ('Engineering'),
@@ -9,7 +7,6 @@ INSERT INTO department (name)
     ('Marketing'),
     ('Sales');  
 
---Added Department ids, titles, and salaries for ROLES--
 INSERT INTO role (title, salary, department_id)
     VALUES
     ('Engineering Manager', 220000, 1),
@@ -22,21 +19,20 @@ INSERT INTO role (title, salary, department_id)
     ('Marketing Analyst', 150000, 3),
     ('Marketing Agent', 125000, 3),
     ('Sales Manager', 300000, 4),
-    ('Sales Agent', 215000, 4);
+    ('Sales Agent', 215000, 4),
     ('Sales Assistant', 192000, 4);
 
---Added EMPLOYEE NAMES with role and manager ids--
-INSERT INTO employee (first_name, last_name, role_id, manager_id)
+INSERT INTO employee (first_name, last_name, role_id)
     VALUES
-    ('Shelena', 'Brand', 1, 1),
-    ('Corrie', 'Brand', 2, 1),
-    ('LC', 'Brand', 3, 1),
-    ('Mansa', 'Musa', 4, 4),
-    ('Ashley', 'Springs', 5, 4),
-    ('Danielle', 'McManus', 6, 4),
-    ('Tiffany', 'Evans', 11, 11),
-    ('Denice', 'Dimes', 12, 11);
-    ('Betty', 'Rock', 7, 7),
-    ('Morgan', 'Faust', 8, 7),
-    ('Skina', 'Marinkey', 9, 7),
-    ('Jason', 'Jackson', 10, 10),
+    ('Shelena', 'Brand', 1),
+    ('Corrie', 'Brand', 2),
+    ('LC', 'Brand', 3),
+    ('Mansa', 'Musa', 4),
+    ('Ashley', 'Springs', 5),
+    ('Danielle', 'McManus', 6),
+    ('Tiffany', 'Evans', 11),
+    ('Denice', 'Dimes', 12),
+    ('Betty', 'Rock', 7),
+    ('Morgan', 'Faust', 8),
+    ('Skina', 'Marinkey', 9),
+    ('Jason', 'Jackson', 10);
